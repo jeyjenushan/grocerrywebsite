@@ -7,7 +7,7 @@ import ProductCard from "../components/ProductCard";
 const ProductDetails = () => {
   const { products, navigate, currency, addToCart } = useAppContext();
   const { id } = useParams();
-  const product = products.find((product) => product._id == id);
+  const product = products.find((product) => product.id == id);
   const [thumbnail, setThumbnail] = useState();
   const [relatedProducts, setRelatedProducts] = useState([]);
 
@@ -83,22 +83,18 @@ const ProductDetails = () => {
             </div>
 
             <p className="text-base font-medium mt-6">About Product</p>
-            <ul className="list-disc ml-4 text-gray-500/70">
-              {product.description.map((desc, index) => (
-                <li key={index}>{desc}</li>
-              ))}
-            </ul>
+            <p className="ml-4 text-gray-500/70">{product.description}</p>
 
             <div className="flex items-center mt-10 gap-4 text-base">
               <button
-                onClick={() => addToCart(product._id)}
+                onClick={() => addToCart(product.id)}
                 className="w-full py-3.5 cursor-pointer font-medium bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition"
               >
                 Add to Cart
               </button>
               <button
                 onClick={() => {
-                  addToCart(product._id);
+                  addToCart(product.id);
                   navigate("/cart");
                 }}
                 className="w-full py-3.5 cursor-pointer font-medium bg-primary text-white hover:bg-primary-dull transition"
@@ -116,7 +112,7 @@ const ProductDetails = () => {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-6 lg:grid-cols-5 mt-6 w-full">
             {relatedProducts
-              .filter((product) => product.inStock && product._id != id)
+              .filter((product) => product.inStock && product.id != id)
               .map((product, index) => (
                 <ProductCard key={index} product={product} />
               ))}

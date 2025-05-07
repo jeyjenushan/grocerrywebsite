@@ -3,9 +3,10 @@ import { AppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 import { assets } from "../greencart_assets/assets";
+import axios from "axios";
 
 const Register = () => {
-  const { navigate } = useContext(AppContext);
+  const { navigate, backEndUrl } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,19 +26,39 @@ const Register = () => {
   };
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
     setLoading(true);
+    try {
+      e.preventDefault();
+      const studentObj = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      };
 
-    const studentObj = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    };
+      const formDataToSend = new FormData();
+      formDataToSend.append("user", JSON.stringify(studentObj));
+      if (image) {
+        formDataToSend.append("image", image);
+      } else {
+        toast.error("Image file is required");
+        return;
+      }
+      const { data } = await axios.post(
+        `${backEndUrl}/api/auth/register`,
+        formDataToSend
+      );
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("user", JSON.stringify(studentObj));
-    if (image) {
-      formDataToSend.append("image", image);
+      if (data.success) {
+        toast.success("The user is registered successfully");
+        navigate("/login");
+      } else {
+        toast.error("The user is not registered successfully");
+      }
+    } catch (error) {
+      console.log(error.message);
+      toast.error("The user is not correctly registered and please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,7 +129,7 @@ const Register = () => {
                 <input
                   type="file"
                   id="thumbnailImage"
-                  onChange={(e) => setImage(e.target.files[0])}
+                  onChange={handleFileChange}
                   accept="image/"
                   hidden
                 />

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Oval } from "react-loader-spinner";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { AppContext } from "../context/AppContext";
+import { AppContext, useAppContext } from "../context/AppContext";
 import { assets } from "../greencart_assets/assets";
 const SlideLeft = (delay) => {
   return {
@@ -47,8 +47,7 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { sendOtp, verifyOtp, resetPassword } = useContext(AppContext);
-
+  const { sendOtp, verifyOtp, resetPassword } = useAppContext();
   const handleSendOtp = async () => {
     setLoading(true);
     if (email.trim() === "") {
@@ -58,6 +57,8 @@ const ForgotPassword = () => {
     }
 
     const success = await sendOtp(email); // Let AdminContext handle errors and notifications
+
+    console.log(success);
 
     if (success) {
       localStorage.setItem("email", email);
@@ -160,7 +161,7 @@ const ForgotPassword = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full p-3 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                className="w-full p-3 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-2 focus:bg-white text-gray-800"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -201,7 +202,7 @@ const ForgotPassword = () => {
                     value={value}
                     onChange={(e) => handleChangeOtp(e.target.value, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
-                    className="w-14 h-14 text-center text-2xl border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    className="w-14 h-14 text-center text-2xl border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:bg-white text-gray-800"
                   />
                 ))}
               </div>
@@ -210,7 +211,7 @@ const ForgotPassword = () => {
                 className={`w-full bg-primary text-white py-3 rounded-md flex items-center justify-center ${
                   loading
                     ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-700"
+                    : "bg-primary"
                 }`}
                 disabled={loading}
               >
@@ -232,14 +233,14 @@ const ForgotPassword = () => {
               <input
                 type="password"
                 placeholder="New password"
-                className="w-full p-3 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                className="w-full p-3 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:bg-white text-gray-800"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
               <input
                 type="password"
                 placeholder="Confirm password"
-                className="w-full p-3 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                className="w-full p-3 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-2 focus:bg-white text-gray-800"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -248,7 +249,7 @@ const ForgotPassword = () => {
                 className={`w-full bg-primary text-white py-3 rounded-md flex items-center justify-center ${
                   loading
                     ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-700"
+                    : "hover:bg-primary-dull"
                 }`}
                 disabled={loading}
               >

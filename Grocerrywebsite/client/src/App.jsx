@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import { Toaster } from "react-hot-toast";
@@ -18,10 +18,12 @@ import SellerLayout from "./pages/Seller/SellerLayout";
 import AddProduct from "./pages/Seller/AddProduct";
 import Orders from "./pages/Seller/Orders";
 import ProductList from "./pages/Seller/ProductList";
+import CustomToaster from "./components/CustomToaster";
+import Verify from "./pages/Verify";
 
 function App() {
   const location = useLocation();
-  const { showUserLogin, isSeller } = useAppContext();
+  const { sellerToken, userToken } = useAppContext();
 
   const hideNavbarFooterPaths = [
     "/seller",
@@ -32,12 +34,11 @@ function App() {
   const shouldHideNavbarFooter = hideNavbarFooterPaths.some((path) =>
     location.pathname.includes(path)
   );
-  console.log(location.pathname);
 
   return (
     <div className="text-default min-h-screen text-gray-700 bg-white">
       {!shouldHideNavbarFooter && <Navbar />}
-      <Toaster />
+      <CustomToaster />
       <div
         className={`${
           shouldHideNavbarFooter ? "" : "px-6 md:px-16 lg:px-24 xl:px-32"
@@ -51,18 +52,54 @@ function App() {
           <Route path="/products" element={<AllProducts />} />
           <Route path="/products/:category" element={<ProductCategory />} />
           <Route path="/products/:category/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/addAddress" element={<AddAddress />} />
-          <Route path="my-orders" element={<MyOrders />} />
+          <Route path="/loader" element={<Verify />} />
+
+          <Route
+            path="/cart"
+            element={
+              userToken ? (
+                <Cart />
+              ) : (
+                <Navigate to="/login" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/addAddress"
+            element={
+              userToken ? (
+                <AddAddress />
+              ) : (
+                <Navigate to="/login" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              userToken ? (
+                <MyOrders />
+              ) : (
+                <Navigate to="/login" replace state={{ from: location }} />
+              )
+            }
+          />
 
           <Route
             path="/seller"
-            element={isSeller ? <SellerLayout /> : <SellerLogin />}
+            element={
+              sellerToken ? (
+                <SellerLayout />
+              ) : (
+                <Navigate to="/seller/login" replace />
+              )
+            }
           >
-            <Route index element={isSeller ? <AddProduct /> : null} />
+            <Route index element={<AddProduct />} />
             <Route path="product-list" element={<ProductList />} />
             <Route path="orders" element={<Orders />} />
           </Route>
+          <Route path="/seller/login" element={<SellerLogin />} />
         </Routes>
       </div>
       {!shouldHideNavbarFooter && <Footer />}

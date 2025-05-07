@@ -4,7 +4,7 @@ import { assets } from "../../greencart_assets/assets";
 import { Link, NavLink, Outlet } from "react-router-dom";
 
 const SellerLayout = () => {
-  const { setIsSeller } = useAppContext();
+  const { setIsSeller, setSellerToken } = useAppContext();
 
   const sidebarLinks = [
     { name: "Add Product", path: "/seller", icon: assets.add_icon },
@@ -17,6 +17,8 @@ const SellerLayout = () => {
   ];
 
   const logout = async () => {
+    localStorage.removeItem("stoken");
+    setSellerToken(false);
     setIsSeller(false);
   };
 

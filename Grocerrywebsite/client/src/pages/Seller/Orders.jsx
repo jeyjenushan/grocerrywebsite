@@ -29,10 +29,11 @@ const Orders = () => {
                 alt="boxIcon"
               />
               <div>
-                {order.items.map((item, index) => (
+                {order.orderItems.map((item, index) => (
                   <div key={index} className="flex flex-col ">
                     <p className="font-medium">
-                      {item.product.name}{""}
+                      {item.product.name}
+                      {""}
                       <span className="text-primary">x {item.quantity}</span>
                     </p>
                   </div>
@@ -61,8 +62,8 @@ const Orders = () => {
 
             <div className="flex flex-col text-sm md:text-base text-black/60">
               <p>Method: {order.paymentType}</p>
-              <p>Date: {new Date(order.orderDate).toLocaleDateString()}</p>
-              <p>Payment: {order.isPaid ? "Paid" : "Pending"}</p>
+              <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+              <p>Payment: {order.Paid ? "Paid" : "Pending"}</p>
             </div>
           </div>
         ))}

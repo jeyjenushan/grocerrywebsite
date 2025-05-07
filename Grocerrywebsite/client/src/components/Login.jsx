@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Oval } from "react-loader-spinner";
 import { FaTimes } from "react-icons/fa";
@@ -15,7 +15,15 @@ const Login = () => {
   const [otpBar, setOtpBar] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [remember, setRemember] = useState(false);
-  const { navigate, showUserLogin } = useAppContext();
+  const {
+    navigate,
+    showUserLogin,
+    backEndUrl,
+    userToken,
+    setUserToken,
+    user,
+    setUser,
+  } = useAppContext();
 
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
@@ -45,6 +53,37 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+    setLoading(true);
+
+    try {
+      const { data } = await axios.post(
+        backEndUrl + "/api/auth/login",
+        formData
+      );
+      const role = data.userDto.role;
+
+      if (remember) {
+        localStorage.setItem("rememberedEmail", formData.email);
+        localStorage.setItem("rememberedPassword", formData.password);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+      }
+
+      if (role == "USER") {
+        setUserToken(data.token);
+        localStorage.setItem("utoken", data.token);
+        setUser(data.userDto);
+        navigate("/");
+      } else {
+        toast.error("Unauthorized role cannot access this website.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

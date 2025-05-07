@@ -8,13 +8,17 @@ const Navbar = () => {
   const {
     user,
     setUser,
-    showUserLogin,
     setShowUserLogin,
+    setUserToken,
+    setCartItems,
     navigate,
     searchQuery,
     setSearchQuery,
     getCartCount,
+    userToken,
   } = useAppContext();
+
+  console.log(user);
 
   useEffect(() => {
     if (searchQuery.length > 0) {
@@ -23,6 +27,8 @@ const Navbar = () => {
   }, [searchQuery]);
 
   const logout = async () => {
+    localStorage.removeItem("utoken");
+    setUserToken(null);
     setUser(null);
     navigate("/");
   };
@@ -57,9 +63,11 @@ const Navbar = () => {
             alt="cart"
             className="w-6 opacity-80"
           />
-          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
-            {getCartCount()}
-          </button>
+          {userToken && (
+            <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
+              {getCartCount()}
+            </button>
+          )}
         </div>
 
         {!user ? (
@@ -71,25 +79,21 @@ const Navbar = () => {
           </button>
         ) : (
           <div className="relative group">
-            <img src={assets.profile_icon} className="w-10" alt="" />
-            <ul
-              className="hidden group-hover:block absolute top-10 right-0 bg-white
-            shadow border border-gray-200 py-2.5 w-30 rounded-md text-sm z-40
-            "
-            >
-              <li
-                onClick={() => navigate("my-orders")}
-                className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
-              >
-                MyOrders
-              </li>
-              <li
-                onClick={logout}
-                className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
-              >
-                Logout
-              </li>
-            </ul>
+            <img src={user.image} className="w-10" alt="" />
+            <img className="w-2.5" src={assets.dropdown_icon} alt="" />
+            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
+              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
+                <p
+                  onClick={() => navigate("/my-orders")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Orders
+                </p>
+                <p onClick={logout} className="hover:text-black cursor-pointer">
+                  Logout
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -111,7 +115,6 @@ const Navbar = () => {
         <button
           onClick={() => (open ? setOpen(false) : setOpen(true))}
           aria-label="Menu"
-        
         >
           {/* Menu Icon SVG */}
           <img src={assets.menu_icon} alt="menu" className="" />

@@ -1,12 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+
 import { Oval } from "react-loader-spinner";
 import { FaTimes } from "react-icons/fa";
 import { useAppContext } from "../../context/AppContext";
 
-const SellerLogin = () => {
+const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -15,7 +15,14 @@ const SellerLogin = () => {
   const [otpBar, setOtpBar] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [remember, setRemember] = useState(false);
-  const { navigate, showUserLogin } = useAppContext();
+  const {
+    navigate,
+    showUserLogin,
+    backEndUrl,
+    sellerToken,
+    setSellerToken,
+    setIsSeller,
+  } = useAppContext();
 
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
@@ -45,6 +52,37 @@ const SellerLogin = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+    setLoading(true);
+
+    try {
+      const { data } = await axios.post(
+        backEndUrl + "/api/auth/login",
+        formData
+      );
+      const role = data.userDto.role;
+
+      if (remember) {
+        localStorage.setItem("rememberedEmail", formData.email);
+        localStorage.setItem("rememberedPassword", formData.password);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+      }
+
+      if (role == "SELLER") {
+        setSellerToken(data.token);
+        localStorage.setItem("stoken", data.token);
+        setIsSeller(true);
+        navigate("/seller");
+      } else {
+        toast.error("Unauthorized role cannot access this website.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +90,7 @@ const SellerLogin = () => {
       <div className="flex flex-col gap-4 m-auto items-start p-8 w-full max-w-md border rounded-xl text-gray-600 text-sm shadow-lg bg-white">
         <h2 className="text-2xl font-semibold m-auto text-gray-800">
           <p>
-            <span className="text-primary">Seller</span>Login
+            <span className="text-primary">User</span>Login
           </p>
         </h2>
 
@@ -196,4 +234,4 @@ const SellerLogin = () => {
   );
 };
 
-export default SellerLogin;
+export default Login;

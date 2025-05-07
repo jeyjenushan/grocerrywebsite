@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "../greencart_assets/assets";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const InputField = ({ type, placeholder, name, handleChange, address }) => {
   return (
@@ -18,6 +21,7 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => {
 };
 
 const AddAddress = () => {
+  const { userToken, backEndUrl, user, navigate } = useAppContext();
   const [address, setAddress] = useState({
     firstName: "",
     lastName: "",
@@ -39,7 +43,36 @@ const AddAddress = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        `${backEndUrl}/api/user/addAddress`,
+        address, // request body
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setAddress(data.addressDto);
+        navigate("/cart");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+ 
+    }
   };
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/cart");
+    }
+    console.log(user);
+  }, []);
 
   return (
     <div className="mt-16 pb-16">
